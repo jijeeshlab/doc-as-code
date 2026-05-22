@@ -1,4 +1,4 @@
-# Greenfield Platform Auto-Generated API
+# Greenfield Infrastructure System Design (Automated)
 
 ::: src.deploy
 
