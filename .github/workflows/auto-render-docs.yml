@@ -92,10 +92,11 @@ jobs:
         run: |
           pip install mkdocs-material "mkdocstrings[python]"
 
-      # Step 8: Build the site assets using strict link auditing guidelines
+      # Step 8: Build the site assets with explicit python paths exposed to the compiler
       - name: Compile Automated Portal Structure
         run: |
           cd hub
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
           mkdocs build --strict
 
       # Step 9: Launch deployment modifications directly to live production web nodes
