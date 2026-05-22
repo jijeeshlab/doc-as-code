@@ -12,32 +12,40 @@ jobs:
   ingest-and-publish:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the hosting central hub repository
       - name: Checkout Central Documentation Hub
         uses: actions/checkout@v4
         with:
           path: hub
 
+      # Step 2: Checkout the legacy documents folder (Hardened with direct branch mapping)
       - name: Ingest Legacy Manual Repository (currentdoc)
         uses: actions/checkout@v4
         with:
           repository: jijeeshlab/currentdoc
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: currentdoc_src
+          ref: main
 
+      # Step 3: Checkout greenfield system source code (Hardened with direct branch mapping)
       - name: Ingest Greenfield Source Code Repository
         uses: actions/checkout@v4
         with:
           repository: jijeeshlab/greenfield-code
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: greenfield_src
+          ref: main
 
+      # Step 4: Checkout brownfield system source code (Hardened with direct branch mapping)
       - name: Ingest Brownfield Source Code Repository
         uses: actions/checkout@v4
         with:
           repository: jijeeshlab/brownfield-code
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: brownfield_src
+          ref: main
 
+      # Step 5: Consolidate application directories and legacy checklists into compilation staging
       - name: Consolidate Code Assets and Manual Artifacts
         run: |
           mkdir -p hub/src
@@ -46,20 +54,24 @@ jobs:
           [ -d "brownfield_src/src" ] && cp -r brownfield_src/src/. hub/src/
           rsync -av --exclude='.git*' currentdoc_src/ hub/docs/legacy/
 
+      # Step 6: Initialize isolated execution environment for parsing filters
       - name: Set Up Python Environment Engine
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # Step 7: Install documentation web layout engine and source parsers
       - name: Install MkDocs and Automated AutoDoc Parsers
         run: |
           pip install mkdocs-material "mkdocstrings[python]"
 
+      # Step 8: Build the final clean, static operational portal with strict dead-link validation
       - name: Compile Automated Portal Structure
         run: |
           cd hub
           mkdocs build --strict
 
+      # Step 9: Deploy the finished, self-healed static artifacts directly to GitHub Pages
       - name: Deploy Self-Healed Unified Artifacts to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
