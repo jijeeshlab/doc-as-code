@@ -18,7 +18,7 @@ jobs:
         with:
           path: hub
 
-      # Step 2: Ingest legacy documents (Hardened with read-only restriction)
+      # Step 2: Ingest legacy documents (Persist-credentials FALSE disables the 403 write-lock)
       - name: Ingest Legacy Manual Repository (currentdoc)
         uses: actions/checkout@v4
         with:
@@ -26,9 +26,9 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: currentdoc_src
           ref: main
-          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
+          persist-credentials: false # <--- CRITICAL FOR FINE-GRAINED TOKENS
 
-      # Step 3: Ingest greenfield source code (Hardened with read-only restriction)
+      # Step 3: Ingest greenfield source code
       - name: Ingest Greenfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -36,9 +36,9 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: greenfield_src
           ref: main
-          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
+          persist-credentials: false # <--- CRITICAL FOR FINE-GRAINED TOKENS
 
-      # Step 4: Ingest brownfield source code (Hardened with read-only restriction)
+      # Step 4: Ingest brownfield source code
       - name: Ingest Brownfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -46,7 +46,7 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: brownfield_src
           ref: main
-          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
+          persist-credentials: false # <--- CRITICAL FOR FINE-GRAINED TOKENS
 
       # Step 5: Consolidate application directories and legacy checklists into compilation staging
       - name: Consolidate Code Assets and Manual Artifacts
