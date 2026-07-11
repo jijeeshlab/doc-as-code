@@ -1,0 +1,26 @@
+name: Documentation Dispatch
+
+on:
+  repository_dispatch:
+    types:
+      - documentation_update_requested
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+
+  documentation-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Display Event
+        run: |
+          echo "Repository dispatch received"
+          echo ""
+          echo '${{ toJson(github.event.client_payload) }}'
