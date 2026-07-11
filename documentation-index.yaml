@@ -1,0 +1,13 @@
+services:
+
+  greenfield-network:
+    hld: docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network.md
+    lld: docs/02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network.md
+
+  security-compliance:
+    hld: docs/07-Security-and-Compliance/01-Security-Posture/security-compliance.md
+    lld: docs/07-Security-and-Compliance/03-Access-Control/security-compliance.md
+
+  migration-platform:
+    hld: docs/08-Migrations-and-Projects/migration-platform.md
+    lld: docs/08-Migrations-and-Projects/migration-platform-lld.md
