@@ -42,7 +42,7 @@ jobs:
       - name: Deploy all branches 🚀
         shell: bash
         run: |
-          git fetch origin develop
+          git fetch origin main
 
           BRANCHES=("main")
 
