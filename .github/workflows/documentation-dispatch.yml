@@ -13,14 +13,48 @@ permissions:
 
 jobs:
 
-  documentation-test:
+  documentation-generation:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Display Event
+      - name: Checkout Documentation Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/Actions
+          path: _actions
+
+      - name: Checkout Template Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/doc-templete
+          path: template
+
+      - name: Checkout Source Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.client_payload.source_repo_full }}
+          path: source
+
+      - name: Create doc-request.json
         run: |
-          echo "Repository dispatch received"
-          echo ""
-          echo '${{ toJson(github.event.client_payload) }}'
+          cat > doc-request.json <<'EOF'
+          ${{ toJson(github.event.client_payload) }}
+          EOF
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install pyyaml
+
+      - name: Show Request
+        run: |
+          cat doc-request.json
