@@ -22,39 +22,110 @@ jobs:
       - name: Checkout Documentation Repository
         uses: actions/checkout@v4
 
+      - name: Verify GitHub Authentication
+        env:
+          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
+          gh auth status
+
+      - name: Verify Access To Template Repository
+        env:
+          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
+          gh repo view jijeeshlab/doc-templete
+
+      - name: Verify Access To Actions Repository
+        env:
+          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
+          gh repo view jijeeshlab/Actions
+
       - name: Checkout Actions Repository
         uses: actions/checkout@v4
         with:
           repository: jijeeshlab/Actions
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: _actions
+          ref: main
+          persist-credentials: false
 
       - name: Checkout Template Repository
         uses: actions/checkout@v4
         with:
           repository: jijeeshlab/doc-templete
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: template
+          ref: main
+          persist-credentials: false
 
       - name: Checkout Source Repository
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event.client_payload.source_repo_full }}
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: source
+          ref: main
+          persist-credentials: false
+
+      - name: Show Received Payload
+        run: |
+          echo '${{ toJson(github.event.client_payload) }}'
 
       - name: Create doc-request.json
         run: |
+
           cat > doc-request.json <<'EOF'
           ${{ toJson(github.event.client_payload) }}
           EOF
 
+      - name: Display Generated Request
+        run: |
+          cat doc-request.json
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Show Request
+      - name: Generate HLD
         run: |
-          cat doc-request.json
+          python _actions/scripts/generate-hld.py
+
+      - name: Generate LLD
+        run: |
+          python _actions/scripts/generate-lld.py
+
+      - name: Generate Diagrams
+        run: |
+          python _actions/scripts/generate-diagram.py
+
+      - name: Update Navigation
+        run: |
+          python _actions/scripts/update-navigation.py
+
+      - name: Show Generated Files
+        run: |
+          find docs -type f || true
+          find generated -type f || true
+
+      - name: Commit Generated Documentation
+        run: |
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No documentation updates generated."
+            exit 0
+          fi
+
+          git commit -m "Automated documentation update"
+
+          git push
