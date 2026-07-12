@@ -9,20 +9,15 @@
 ## 1. Introduction
 
 ### 1.1. Overview
-The greenfield network capability provides automated deployment of cloud networking services including zero-trust network provisioning, network segmentation validation, load balancer deployment, DNS integration, VPN gateway deployment, and storage gateway connectivity.
+The greenfield-network capability provides automated infrastructure services detected from source repository changes.
 
-This document was generated from source repository `jijeeshlab/greenfield-code` and pull request `7`.
+This document was generated from source repository `jijeeshlab/greenfield-code` and pull request `8`.
 
 **Source PR Title**: Update deploy.py
 
 ### 1.2. Scope
 #### 1.2.1. In Scope
-- `provision_zero_trust_network()`
-- `validate_network_segmentation()`
-- `deploy_application_load_balancer()`
-- `deploy_private_dns_zone()`
-- `deploy_vpn_gateway()`
-- `deploy_storage_gateway()`
+- To Be Determined (TBD)
 
 #### 1.2.2. Out of Scope
 - Manual deployment steps not represented in the source code.
@@ -49,12 +44,7 @@ This document was generated from source repository `jijeeshlab/greenfield-code` 
 ## 2. Requirements
 
 ### 2.1. Functional Requirements
-- `provision_zero_trust_network()`
-- `validate_network_segmentation()`
-- `deploy_application_load_balancer()`
-- `deploy_private_dns_zone()`
-- `deploy_vpn_gateway()`
-- `deploy_storage_gateway()`
+- To Be Determined (TBD)
 
 ### 2.2. Non-Functional Requirements (NFRs)
 - **Performance**: To Be Determined (TBD)
@@ -80,8 +70,7 @@ graph TD
 ```
 
 ### 3.2. System Components
-- **src/deploy.py**: Author: Jijeesh Valappil
-Module: Greenfield Cloud Infrastructure Automation Engine
+- **src/deploy.py**: Source module detected.
 
 ### 3.3. Technology Stack
 - GitHub

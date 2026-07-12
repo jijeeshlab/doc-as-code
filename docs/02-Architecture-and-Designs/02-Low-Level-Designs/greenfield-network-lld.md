@@ -5,7 +5,7 @@
 **Version**: 1.0
 
 **Source Repository**: `jijeeshlab/greenfield-code`
-**Source PR Number**: `7`
+**Source PR Number**: `8`
 **Source PR Title**: Update deploy.py
 
 ---
@@ -49,109 +49,14 @@ sequenceDiagram
 
 ### Source File: `src/deploy.py`
 
-#### Function: `provision_zero_trust_network`
-
-**Description:** Provisions isolated platform network boundaries
-with NSX-T Distributed Firewall enforcement.
-
-Args:
-    vpc_cidr (str):
-        The primary IP block schema allocation
-        (e.g. 10.0.0.0/16).
-
-Returns:
-    bool:
-        True if successful.
-
-**Parameters:** vpc_cidr
-
-**Returns:** bool
-
-#### Function: `validate_network_segmentation`
-
-**Description:** Validates network segmentation policies
-before deployment.
-
-Args:
-    segment_name (str):
-        Network segment name.
-
-Returns:
-    bool:
-        Validation result.
-
-**Parameters:** segment_name
-
-**Returns:** bool
-
-#### Function: `deploy_application_load_balancer`
-
-**Description:** Deploys a software-defined load balancer.
-
-Args:
-    lb_name (str):
-        Load balancer name.
-
-    vip_address (str):
-        Virtual IP address.
-
-Returns:
-    dict:
-        Deployment result.
-
-**Parameters:** lb_name, vip_address
-
-**Returns:** dict
-
-#### Function: `deploy_private_dns_zone`
-
-**Description:** Deploys private DNS zone
-for internal cloud services.
-
-**Parameters:** zone_name
-
-**Returns:** dict
-
-#### Function: `deploy_vpn_gateway`
-
-**Description:** Deploys VPN gateway service
-for hybrid cloud connectivity.
-
-**Parameters:** gateway_name, public_ip
-
-**Returns:** dict
-
-#### Function: `deploy_storage_gateway`
-
-**Description:** Deploys storage gateway service
-for cloud storage connectivity.
-
-Args:
-    gateway_name (str):
-        Name of storage gateway.
-
-    storage_pool (str):
-        Backend storage pool.
-
-Returns:
-    dict:
-        Deployment result.
-
-**Parameters:** gateway_name, storage_pool
-
-**Returns:** dict
+No functions detected.
 
 
 ---
 
 # 3. Function Inventory
 
-- `provision_zero_trust_network()`
-- `validate_network_segmentation()`
-- `deploy_application_load_balancer()`
-- `deploy_private_dns_zone()`
-- `deploy_vpn_gateway()`
-- `deploy_storage_gateway()`
+- To Be Determined (TBD)
 
 ---
 
