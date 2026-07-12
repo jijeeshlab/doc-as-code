@@ -1,4 +1,4 @@
-name: Documentation Dispatch
+name: Documentation Dispatch Debug
 
 on:
   workflow_dispatch:
@@ -11,49 +11,48 @@ jobs:
 
     steps:
 
-      - name: Checkout Current Repository
-        uses: actions/checkout@v4
-
-      - name: Show Current User
+      - name: Show Current GitHub User
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          echo "===================================="
+          echo "========================================"
           echo "CURRENT USER"
-          echo "===================================="
-
+          echo "========================================"
           gh api user
 
-      - name: Verify Repository Access
+      - name: Test Repository API Access
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          echo "===================================="
-          echo "DOC-TEMPLETE"
-          echo "===================================="
+          echo "========================================"
+          echo "DOC-TEMPLETE REPOSITORY"
+          echo "========================================"
 
-          gh api repos/jijeeshlab/doc-templete || true
+          gh api repos/jijeeshlab/doc-templete
 
           echo ""
-
-          echo "===================================="
+          echo "========================================"
           echo "MAIN BRANCH"
-          echo "===================================="
+          echo "========================================"
 
-          gh api repos/jijeeshlab/doc-templete/branches/main || true
+          gh api repos/jijeeshlab/doc-templete/branches/main
 
-      - name: Clone Repository Test
+      - name: Manual Clone Test
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          echo "===================================="
-          echo "CLONE TEST"
-          echo "===================================="
+          echo "========================================"
+          echo "MANUAL CLONE TEST"
+          echo "========================================"
 
           git clone \
             https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
             template
 
-      - name: Verify Files
+      - name: Show Files
         run: |
+          echo "========================================"
+          echo "FILES"
+          echo "========================================"
+
           find template -maxdepth 3 -type f | sort
