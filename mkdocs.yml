@@ -1,9 +1,13 @@
-# --- this is configuration for main documentation site ---
+# --------------------------------------------------------------------
+# Main Documentation Site Configuration
+# --------------------------------------------------------------------
 
-site_name: Test
+site_name: ATOS VMware Cloud Services
 site_author: VCS Engineering
 
 site_url: https://jijeeshlab.github.io/doc-as-code/
+
+docs_dir: docs
 
 use_directory_urls: true
 
@@ -14,12 +18,18 @@ validation:
     not_found: warn
     anchors: warn
 
-# --- main page link to repo ---
+# --------------------------------------------------------------------
+# Repository Information
+# --------------------------------------------------------------------
 
 repo_url: https://github.com/jijeeshlab/doc-as-code
 repo_name: doc-as-code
 
 copyright: Copyright © 2026 Atos
+
+# --------------------------------------------------------------------
+# Theme
+# --------------------------------------------------------------------
 
 theme:
   name: material
@@ -34,6 +44,7 @@ theme:
 
   palette:
 
+    # Light Mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: blue
@@ -42,6 +53,7 @@ theme:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
 
+    # Dark Mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: blue
@@ -56,9 +68,9 @@ theme:
   logo: images/logos/New_Atos_logo_white.png
   favicon: images/logos/Atos_logo_blue.png
 
-###############################################################################
-# NAVIGATION
-###############################################################################
+# --------------------------------------------------------------------
+# Navigation
+# --------------------------------------------------------------------
 
 nav:
 
@@ -74,9 +86,9 @@ nav:
 
           - Greenfield Network LLD: 02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md
 
-###############################################################################
-# MARKDOWN EXTENSIONS
-###############################################################################
+# --------------------------------------------------------------------
+# Markdown Extensions
+# --------------------------------------------------------------------
 
 markdown_extensions:
 
@@ -122,25 +134,9 @@ markdown_extensions:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
-###############################################################################
-# EXTRA
-###############################################################################
-
-extra:
-
-  version:
-    provider: mike
-
-###############################################################################
-# CSS
-###############################################################################
-
-extra_css:
-  - stylesheets/extended.css
-
-###############################################################################
-# PLUGINS
-###############################################################################
+# --------------------------------------------------------------------
+# Plugins
+# --------------------------------------------------------------------
 
 plugins:
 
@@ -153,3 +149,19 @@ plugins:
       draggable: true
       skip_classes:
         - skip-lightbox
+
+# --------------------------------------------------------------------
+# Versioning
+# --------------------------------------------------------------------
+
+extra:
+
+  version:
+    provider: mike
+
+# --------------------------------------------------------------------
+# CSS
+# --------------------------------------------------------------------
+
+extra_css:
+  - stylesheets/extended.css
