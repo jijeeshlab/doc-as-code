@@ -21,7 +21,7 @@ jobs:
       - name: Verify New Workflow Loaded
         run: |
           echo "=================================="
-          echo "NEW DOCUMENTATION DISPATCH"
+          echo "DOCUMENTATION GENERATION STARTED"
           echo "=================================="
 
       - name: Checkout Current Repository
@@ -31,11 +31,6 @@ jobs:
         run: |
           echo '${{ toJson(github.event.client_payload) }}'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Create doc-request.json
         run: |
           cat > doc-request.json << 'EOF'
@@ -44,11 +39,114 @@ jobs:
 
           cat doc-request.json
 
-      - name: Show Workspace
+      - name: Clone Actions Repository
+        env:
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          pwd
-          ls -la
 
-      - name: Complete
+          rm -rf _actions
+
+          git clone \
+          https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
+          _actions
+
+          echo "=================================="
+          echo "ACTIONS FILES"
+          echo "=================================="
+
+          find _actions -maxdepth 3 -type f | sort
+
+      - name: Clone Template Repository
+        env:
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          echo "Documentation Dispatch Trigger Successful"
+
+          rm -rf template
+
+          git clone \
+          https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
+          template
+
+          echo "=================================="
+          echo "TEMPLATE FILES"
+          echo "=================================="
+
+          find template -maxdepth 3 -type f | sort
+
+      - name: Clone Source Repository
+        env:
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
+
+          rm -rf source
+
+          git clone \
+          https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
+          source
+
+          echo "=================================="
+          echo "SOURCE FILES"
+          echo "=================================="
+
+          find source -maxdepth 5 -type f | sort
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Verify Scripts
+        run: |
+          echo "=================================="
+          echo "SCRIPT FILES"
+          echo "=================================="
+
+          find _actions/scripts -type f | sort
+
+      - name: Generate HLD
+        run: |
+          python _actions/scripts/generate-hld.py
+
+      - name: Generate LLD
+        run: |
+          python _actions/scripts/generate-lld.py
+
+      - name: Generate Diagram
+        run: |
+          python _actions/scripts/generate-diagram.py
+
+      - name: Update Navigation
+        run: |
+          python _actions/scripts/update-navigation.py
+
+      - name: Show Generated Files
+        run: |
+
+          echo "=================================="
+          echo "GENERATED FILES"
+          echo "=================================="
+
+          find docs -type f | sort || true
+          find generated -type f | sort || true
+
+      - name: Commit Changes
+        run: |
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes generated"
+            exit 0
+          fi
+
+          git commit -m "Generate documentation"
+
+          git push
