@@ -1,15 +1,6 @@
-# --------------------------------------------------------------------
-# Main Documentation Site Configuration
-# --------------------------------------------------------------------
-
-site_name: ATOS VMware Cloud Services
-site_author: VCS Engineering
-
-site_url: https://jijeeshlab.github.io/doc-as-code/
-
-docs_dir: docs
-
-use_directory_urls: true
+# --- this is configuration for main documentation site ---
+site_name: Test Page
+site_author: Engineering
 
 strict: false
 
@@ -18,33 +9,24 @@ validation:
     not_found: warn
     anchors: warn
 
-# --------------------------------------------------------------------
-# Repository Information
-# --------------------------------------------------------------------
-
+# --- main page link to repo ---
 repo_url: https://github.com/jijeeshlab/doc-as-code
-repo_name: doc-as-code
-
-copyright: Copyright © 2026 Atos
-
-# --------------------------------------------------------------------
-# Theme
-# --------------------------------------------------------------------
+repo_name: GitHub
+copyright: Copyright &amp;copy; 2026 Atos
 
 theme:
   name: material
   language: en
   font: false
 
+  # font:
+  #   code: Roboto Mono
+
   features:
     - navigation.instant
-    - navigation.sections
-    - navigation.expand
-    - content.code.copy
 
   palette:
-
-    # Light Mode
+    # Light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: blue
@@ -53,7 +35,7 @@ theme:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
 
-    # Dark Mode
+    # Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: blue
@@ -68,100 +50,54 @@ theme:
   logo: images/logos/New_Atos_logo_white.png
   favicon: images/logos/Atos_logo_blue.png
 
-# --------------------------------------------------------------------
-# Navigation
-# --------------------------------------------------------------------
-
-nav:
-
-  - Home: index.md
-
-  - Architecture and Designs:
-
-      - High Level Designs:
-
-          - Greenfield Network HLD: 02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md
-
-      - Low Level Designs:
-
-          - Greenfield Network LLD: 02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md
-
-# --------------------------------------------------------------------
-# Markdown Extensions
-# --------------------------------------------------------------------
+######### navigation here #######################################################
+# add link to your content here, but do not change any other section in this yaml
+######### end of navigation block ###############################################
 
 markdown_extensions:
-
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-
   - admonition
-
   - pymdownx.tabbed:
       alternate_style: true
-
   - pymdownx.tasklist:
       custom_checkbox: true
-
   - pymdownx.highlight:
       linenums: true
       anchor_linenums: true
-
   - pymdownx.details
-
   - pymdownx.snippets:
       base_path: "."
       check_paths: true
-
   - meta
   - attr_list
-
   - smarty:
       smart_quotes: true
-
   - pymdownx.betterem
-
   - def_list
   - tables
   - abbr
   - footnotes
   - md_in_html
-
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
-# --------------------------------------------------------------------
-# Plugins
-# --------------------------------------------------------------------
+extra:
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extended.css
 
 plugins:
-
   - search
-
   - git-revision-date-localized
-
   - glightbox:
       zoomable: true
       draggable: true
       skip_classes:
         - skip-lightbox
-
-# --------------------------------------------------------------------
-# Versioning
-# --------------------------------------------------------------------
-
-extra:
-
-  version:
-    provider: mike
-
-# --------------------------------------------------------------------
-# CSS
-# --------------------------------------------------------------------
-
-extra_css:
-  - stylesheets/extended.css
