@@ -50,12 +50,6 @@ jobs:
             https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
             _actions
 
-          echo "=================================="
-          echo "ACTIONS CONTENT"
-          echo "=================================="
-
-          find _actions -maxdepth 3 -type f | sort
-
       - name: Clone Template Repository
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
@@ -66,12 +60,6 @@ jobs:
             https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
             template
 
-          echo "=================================="
-          echo "TEMPLATE CONTENT"
-          echo "=================================="
-
-          find template -maxdepth 5 -type f | sort
-
       - name: Clone Source Repository
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
@@ -81,12 +69,6 @@ jobs:
           git clone \
             https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
             source
-
-          echo "=================================="
-          echo "SOURCE CONTENT"
-          echo "=================================="
-
-          find source -maxdepth 5 -type f | sort
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -104,7 +86,7 @@ jobs:
           echo "AGENT FILES"
           echo "=================================="
 
-          find _actions/agents -type f | sort
+          find _actions/agents -type f | sort || true
 
       - name: Generate Agent Based Documentation
         run: |
@@ -128,7 +110,7 @@ jobs:
           echo "GENERATED HLD PREVIEW"
           echo "=================================="
 
-          find docs -name "*hld*.md" -exec head -50 {} \;
+          find docs -name "*hld*.md" -exec head -80 {} \;
 
       - name: Verify Generated LLD
         run: |
@@ -136,7 +118,44 @@ jobs:
           echo "GENERATED LLD PREVIEW"
           echo "=================================="
 
-          find docs -name "*lld*.md" -exec head -50 {} \;
+          find docs -name "*lld*.md" -exec head -80 {} \;
+
+      - name: Verify Agent Context Exists
+        run: |
+          echo "=================================="
+          echo "SEARCHING AGENT CONTEXT"
+          echo "=================================="
+
+          grep -R "Agent Context" docs || true
+
+          echo ""
+          echo "=================================="
+          echo "SEARCHING HLD AGENT"
+          echo "=================================="
+
+          grep -R "hld-agent.md" docs || true
+
+          echo ""
+          echo "=================================="
+          echo "SEARCHING LLD AGENT"
+          echo "=================================="
+
+          grep -R "lld-agent.md" docs || true
+
+          echo ""
+          echo "=================================="
+          echo "SEARCHING DIAGRAM AGENT"
+          echo "=================================="
+
+          grep -R "diagram-agent.md" docs || true
+
+      - name: Verify Agent Generator Was Used
+        run: |
+          echo "=================================="
+          echo "SEARCHING FOR AGENT GENERATOR OUTPUT"
+          echo "=================================="
+
+          grep -R "Agent-Aware Documentation Generator" docs || true
 
       - name: Cleanup Temporary Files
         run: |
