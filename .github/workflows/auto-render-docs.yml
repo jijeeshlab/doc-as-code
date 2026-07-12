@@ -4,33 +4,29 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
-
   build-deploy:
-
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
-
-      - name: Checkout
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Python
+      - name: Setup Python 🐍
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install dependencies 🔧
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Configure Git
@@ -38,39 +34,19 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      - name: Validate Documentation
+      - name: Validate Documentation ✅
         run: |
-          echo "=================================="
-          echo "MKDOCS BUILD"
-          echo "=================================="
-
+          echo "Running MkDocs validation..."
           mkdocs build
 
-      - name: Verify Build Output
-        run: |
-          echo "=================================="
-          echo "SITE CONTENT"
-          echo "=================================="
-
-          find site -type f | sort
-
-          echo ""
-          echo "=================================="
-          echo "ROOT SITE FILES"
-          echo "=================================="
-
-          ls -la site
-
-      - name: Deploy all branches
+      - name: Deploy all branches 🚀
         shell: bash
         run: |
-
           git fetch origin main
 
           BRANCHES=("main")
 
           for BRANCH in "${BRANCHES[@]}"; do
-
             echo "======================================"
             echo "Processing branch: $BRANCH"
             echo "======================================"
@@ -83,44 +59,21 @@ jobs:
             if [[ "$BRANCH" == "main" ]]; then
               VERSION="main"
               ALIAS="latest"
+            elif [[ "$BRANCH" == master-* ]]; then
+              VERSION="${BRANCH#master-}"
+            elif [[ "$BRANCH" == DHC-* ]]; then
+              VERSION="${BRANCH#DHC-}"
             fi
 
             echo "Deploying version: $VERSION"
 
             if [[ -n "$ALIAS" ]]; then
-
-              mike deploy \
-                "$VERSION" \
-                "$ALIAS" \
-                --update-aliases \
-                --push
-
+              mike deploy "$VERSION" "$ALIAS" --update-aliases --push
             else
-
-              mike deploy \
-                "$VERSION" \
-                --update-aliases \
-                --push
-
+              mike deploy "$VERSION" --update-aliases --push
             fi
 
           done
 
-          echo "======================================"
-          echo "SETTING DEFAULT VERSION"
-          echo "======================================"
-
+          echo "Setting default version to latest"
           mike set-default latest --push
-
-      - name: Verify gh-pages Content
-        run: |
-
-          git fetch origin gh-pages
-
-          git checkout gh-pages
-
-          echo "=================================="
-          echo "GH-PAGES ROOT"
-          echo "=================================="
-
-          find . -maxdepth 2 -type f | sort
