@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: documentation-generation
+  cancel-in-progress: false
+
 jobs:
 
   documentation-generation:
@@ -152,7 +156,7 @@ jobs:
       - name: Verify Agent Generator Was Used
         run: |
           echo "=================================="
-          echo "SEARCHING FOR AGENT GENERATOR OUTPUT"
+          echo "VERIFY AGENT GENERATOR CONTENT"
           echo "=================================="
 
           grep -R "Agent-Aware Documentation Generator" docs || true
@@ -167,6 +171,10 @@ jobs:
 
       - name: Commit Documentation
         run: |
+
+          echo "=================================="
+          echo "COMMIT DOCUMENTATION"
+          echo "=================================="
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -188,4 +196,38 @@ jobs:
 
           git commit -m "Generate documentation using agents"
 
-          git push
+          echo ""
+          echo "=================================="
+          echo "SYNC WITH REMOTE"
+          echo "=================================="
+
+          for i in 1 2 3; do
+
+            echo ""
+            echo "Attempt: $i"
+
+            git pull --rebase origin main
+
+            if git push origin HEAD:main; then
+
+              echo ""
+              echo "=================================="
+              echo "PUSH SUCCESSFUL"
+              echo "=================================="
+
+              exit 0
+
+            fi
+
+            echo ""
+            echo "Push failed. Retrying..."
+            sleep 5
+
+          done
+
+          echo ""
+          echo "=================================="
+          echo "FAILED AFTER 3 ATTEMPTS"
+          echo "=================================="
+
+          exit 1
