@@ -18,13 +18,7 @@ jobs:
 
     steps:
 
-      - name: Verify New Workflow Loaded
-        run: |
-          echo "=================================="
-          echo "DOCUMENTATION GENERATION STARTED"
-          echo "=================================="
-
-      - name: Checkout Current Repository
+      - name: Checkout Documentation Repository
         uses: actions/checkout@v4
 
       - name: Show Payload
@@ -43,52 +37,31 @@ jobs:
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
           rm -rf _actions
 
           git clone \
           https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
           _actions
 
-          echo "=================================="
-          echo "ACTIONS FILES"
-          echo "=================================="
-
-          find _actions -maxdepth 3 -type f | sort
-
       - name: Clone Template Repository
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
           rm -rf template
 
           git clone \
           https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
           template
 
-          echo "=================================="
-          echo "TEMPLATE FILES"
-          echo "=================================="
-
-          find template -maxdepth 3 -type f | sort
-
       - name: Clone Source Repository
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
           rm -rf source
 
           git clone \
           https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
           source
-
-          echo "=================================="
-          echo "SOURCE FILES"
-          echo "=================================="
-
-          find source -maxdepth 5 -type f | sort
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -100,14 +73,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Verify Scripts
-        run: |
-          echo "=================================="
-          echo "SCRIPT FILES"
-          echo "=================================="
-
-          find _actions/scripts -type f | sort
-
       - name: Generate HLD
         run: |
           python _actions/scripts/generate-hld.py
@@ -116,9 +81,8 @@ jobs:
         run: |
           python _actions/scripts/generate-lld.py
 
-      - name: Generate Diagram
-        run: |
-          python _actions/scripts/generate-diagram.py
+      # REMOVED generate-diagram.py
+      # Diagrams are embedded inside HLD/LLD
 
       - name: Update Navigation
         run: |
@@ -126,24 +90,38 @@ jobs:
 
       - name: Show Generated Files
         run: |
-
           echo "=================================="
           echo "GENERATED FILES"
           echo "=================================="
 
-          find docs -type f | sort || true
-          find generated -type f | sort || true
+          find docs -type f | sort
 
-      - name: Commit Changes
+      - name: Cleanup Temporary Files
+        run: |
+          rm -rf _actions
+          rm -rf source
+          rm -rf template
+          rm -rf generated
+          rm -f doc-request.json
+
+      - name: Commit Documentation
         run: |
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add .
+          git add docs
+
+          if [ -f mkdocs.yml ]; then
+            git add mkdocs.yml
+          fi
+
+          if [ -f documentation-index.yaml ]; then
+            git add documentation-index.yaml
+          fi
 
           if git diff --cached --quiet; then
-            echo "No changes generated"
+            echo "No documentation changes."
             exit 0
           fi
 
