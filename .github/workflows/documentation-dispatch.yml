@@ -1,42 +1,54 @@
-name: Documentation Dispatch TEST
+name: Documentation Dispatch
 
 on:
+  repository_dispatch:
+    types:
+      - documentation_update_requested
+
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
 
-  verify:
+  documentation-generation:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Print Workflow Version
+      - name: Verify New Workflow Loaded
         run: |
           echo "=================================="
-          echo "NEW WORKFLOW LOADED"
+          echo "NEW DOCUMENTATION DISPATCH"
           echo "=================================="
 
-      - name: Show User
-        env:
-          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
-        run: |
-          gh api user
+      - name: Checkout Current Repository
+        uses: actions/checkout@v4
 
-      - name: Show Accessible Repositories
-        env:
-          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Show Payload
         run: |
-          gh repo list jijeeshlab --limit 100
+          echo '${{ toJson(github.event.client_payload) }}'
 
-      - name: Clone doc-templete
-        env:
-          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
-        run: |
-          git clone \
-            https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
-            template
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: Show Files
+      - name: Create doc-request.json
         run: |
-          find template -maxdepth 3 -type f | sort
+          cat > doc-request.json << 'EOF'
+          ${{ toJson(github.event.client_payload) }}
+          EOF
+
+          cat doc-request.json
+
+      - name: Show Workspace
+        run: |
+          pwd
+          ls -la
+
+      - name: Complete
+        run: |
+          echo "Documentation Dispatch Trigger Successful"
