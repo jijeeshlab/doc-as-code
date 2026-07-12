@@ -1,155 +1,42 @@
-name: Documentation Dispatch
+name: Documentation Dispatch TEST
 
 on:
-  repository_dispatch:
-    types:
-      - documentation_update_requested
-
   workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
 
 jobs:
 
-  documentation-generation:
+  verify:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      # Checkout current repo only
-      - name: Checkout Documentation Repository
-        uses: actions/checkout@v4
-
-      # Debug payload
-      - name: Show Payload
+      - name: Print Workflow Version
         run: |
           echo "=================================="
-          echo "RECEIVED PAYLOAD"
+          echo "NEW WORKFLOW LOADED"
           echo "=================================="
-          echo '${{ toJson(github.event.client_payload) }}'
 
-      # Verify token
-      - name: Verify Token
+      - name: Show User
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          echo "=================================="
-          echo "CURRENT USER"
-          echo "=================================="
           gh api user
 
-          echo ""
-          echo "=================================="
-          echo "REPOSITORIES"
-          echo "=================================="
+      - name: Show Accessible Repositories
+        env:
+          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
           gh repo list jijeeshlab --limit 100
 
-      # Clone Actions repo
-      - name: Clone Actions Repository
+      - name: Clone doc-templete
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-          rm -rf _actions
-
           git clone \
-          https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
-          _actions
+            https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
+            template
 
-          find _actions -maxdepth 3 -type f | sort
-
-      # Clone Template repo
-      - name: Clone Template Repository
-        env:
-          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Show Files
         run: |
-          rm -rf template
-
-          git clone \
-          https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
-          template
-
           find template -maxdepth 3 -type f | sort
-
-      # Clone Source repo
-      - name: Clone Source Repository
-        env:
-          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
-        run: |
-          rm -rf source
-
-          git clone \
-          https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
-          source
-
-          find source -maxdepth 5 -type f | sort
-
-      # Build request file
-      - name: Create doc-request.json
-        run: |
-          cat > doc-request.json <<'EOF'
-          ${{ toJson(github.event.client_payload) }}
-          EOF
-
-          cat doc-request.json
-
-      # Python
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      # Dependencies
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml
-
-      # Generate HLD
-      - name: Generate HLD
-        run: |
-          python _actions/scripts/generate-hld.py
-
-      # Generate LLD
-      - name: Generate LLD
-        run: |
-          python _actions/scripts/generate-lld.py
-
-      # Generate Diagrams
-      - name: Generate Diagrams
-        run: |
-          python _actions/scripts/generate-diagram.py
-
-      # Update Navigation
-      - name: Update Navigation
-        run: |
-          python _actions/scripts/update-navigation.py
-
-      # Show docs
-      - name: Show Generated Documentation
-        run: |
-          echo "=================================="
-          echo "GENERATED DOCUMENTS"
-          echo "=================================="
-
-          find docs -type f | sort || true
-          find generated -type f | sort || true
-
-      # Commit changes
-      - name: Commit Generated Docs
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add .
-
-          if git diff --cached --quiet; then
-            echo "No documentation changes."
-            exit 0
-          fi
-
-          git commit -m "Automated documentation update"
-
-          git push
