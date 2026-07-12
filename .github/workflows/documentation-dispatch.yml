@@ -13,7 +13,7 @@ permissions:
 
 jobs:
 
-  debug-template-access:
+  documentation-generation:
 
     runs-on: ubuntu-latest
 
@@ -22,7 +22,14 @@ jobs:
       - name: Checkout Documentation Repository
         uses: actions/checkout@v4
 
-      - name: Show GitHub User
+      - name: Display Received Payload
+        run: |
+          echo "=================================="
+          echo "RECEIVED PAYLOAD"
+          echo "=================================="
+          echo '${{ toJson(github.event.client_payload) }}'
+
+      - name: Verify PAT Authentication
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
@@ -31,12 +38,12 @@ jobs:
           echo "=================================="
           gh api user
 
-      - name: Verify Repository Access
+      - name: Test Repository Access
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
           echo "=================================="
-          echo "DOC-TEMPLETE"
+          echo "DOC-TEMPLETE ACCESS"
           echo "=================================="
 
           gh api repos/jijeeshlab/doc-templete || true
@@ -44,35 +51,114 @@ jobs:
           echo ""
 
           echo "=================================="
-          echo "MAIN BRANCH"
+          echo "ACTIONS REPO ACCESS"
           echo "=================================="
 
-          gh api repos/jijeeshlab/doc-templete/branches/main || true
+          gh api repos/jijeeshlab/Actions || true
 
-      - name: Manual Clone Test
+      - name: Clone Template Repository
         env:
-          GIT_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
           echo "=================================="
-          echo "MANUAL CLONE TEST"
+          echo "CLONE DOC-TEMPLETE"
           echo "=================================="
+
+          rm -rf template
 
           git clone \
-            https://x-access-token:${GIT_TOKEN}@github.com/jijeeshlab/doc-templete.git \
+            https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
             template
 
-      - name: Show Template Content
-        run: |
           echo "=================================="
-          echo "FILES"
+          echo "DOC-TEMPLETE CONTENT"
           echo "=================================="
 
           find template -maxdepth 3 -type f | sort
 
-      - name: Display Dispatch Payload
+      - name: Clone Actions Repository
+        env:
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
           echo "=================================="
-          echo "PAYLOAD"
+          echo "CLONE ACTIONS"
           echo "=================================="
 
-          echo '${{ toJson(github.event.client_payload) }}'
+          rm -rf _actions
+
+          git clone \
+            https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
+            _actions
+
+          echo "=================================="
+          echo "ACTIONS CONTENT"
+          echo "=================================="
+
+          find _actions -maxdepth 3 -type f | sort
+
+      - name: Clone Source Repository
+        env:
+          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+        run: |
+          echo "=================================="
+          echo "CLONE SOURCE REPOSITORY"
+          echo "=================================="
+
+          rm -rf source
+
+          git clone \
+            https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
+            source
+
+          echo "=================================="
+          echo "SOURCE CONTENT"
+          echo "=================================="
+
+          find source -maxdepth 3 -type f | sort
+
+      - name: Create doc-request.json
+        run: |
+          cat > doc-request.json <<'EOF'
+          ${{ toJson(github.event.client_payload) }}
+          EOF
+
+          echo "=================================="
+          echo "DOC REQUEST"
+          echo "=================================="
+
+          cat doc-request.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Generate HLD
+        run: |
+          python _actions/scripts/generate-hld.py
+
+      - name: Generate LLD
+        run: |
+          python _actions/scripts/generate-lld.py
+
+      - name: Generate Diagrams
+        run: |
+          python _actions/scripts/generate-diagram.py
+
+      - name: Update Navigation
+        run: |
+          python _actions/scripts/update-navigation.py
+
+      - name: Show Generated Files
+        run: |
+          echo "=================================="
+          echo "GENERATED DOCUMENTS"
+          echo "=================================="
+
+          find docs -type f | sort || true
+          find generated -type f | sort || true
