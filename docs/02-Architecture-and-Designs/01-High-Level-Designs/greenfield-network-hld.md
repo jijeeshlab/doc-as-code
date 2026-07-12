@@ -1,94 +1,159 @@
 # High-Level Design (HLD): greenfield-network
 
-**Author:** Documentation Automation
-
-**Date:** 2026-07-12
-
-**Version:** 1.0
+**Author**: Jijeesh Valappil
+**Date**: 2026-07-12
+**Version**: 1.0
 
 ---
 
-# 1. Introduction
+## 1. Introduction
 
-## 1.1 Overview
+### 1.1. Overview
+The greenfield network capability provides automated deployment of cloud networking services including zero-trust network provisioning, network segmentation validation, load balancer deployment, DNS integration, VPN gateway deployment, and storage gateway connectivity.
 
-greenfield-network provides automated infrastructure services.
+This document was generated from source repository `jijeeshlab/greenfield-code` and pull request `7`.
 
-## 1.2 Scope
+**Source PR Title**: Update deploy.py
 
-### In Scope
+### 1.2. Scope
+#### 1.2.1. In Scope
+- `provision_zero_trust_network()`
+- `validate_network_segmentation()`
+- `deploy_application_load_balancer()`
+- `deploy_private_dns_zone()`
+- `deploy_vpn_gateway()`
+- `deploy_storage_gateway()`
 
-- Not identified.
+#### 1.2.2. Out of Scope
+- Manual deployment steps not represented in the source code.
+- Production approval and final architecture sign-off.
+- Runtime environment configuration not visible in the changed source files.
 
-### Out of Scope
+### 1.3. Goals and Objectives
+- Keep architecture documentation synchronized with source code changes.
+- Reduce documentation drift between implementation and MkDocs content.
+- Provide reviewable HLD documentation through the Documentation-as-Code pipeline.
+- Establish source-to-document traceability.
 
-- Functionality not identified from source code.
+### 1.4. Acronyms and Abbreviations
+| Term | Definition |
+|------|------------|
+| HLD | High-Level Design |
+| LLD | Low-Level Design |
+| PR | Pull Request |
+| CI/CD | Continuous Integration and Continuous Deployment |
+| Docs-as-Code | Documentation managed through Git, Markdown, pull requests, and automation |
 
 ---
 
-# 2. Business Requirements
+## 2. Requirements
 
-- Not identified.
+### 2.1. Functional Requirements
+- `provision_zero_trust_network()`
+- `validate_network_segmentation()`
+- `deploy_application_load_balancer()`
+- `deploy_private_dns_zone()`
+- `deploy_vpn_gateway()`
+- `deploy_storage_gateway()`
+
+### 2.2. Non-Functional Requirements (NFRs)
+- **Performance**: To Be Determined (TBD)
+- **Scalability**: To Be Determined (TBD)
+- **Availability/Reliability**: To Be Determined (TBD)
+- **Security**: Review required before publishing.
+- **Maintainability**: Generated documentation must remain Markdown-based and reviewable.
+- **Usability**: Documentation must be accessible from the MkDocs portal.
 
 ---
 
-# 3. System Architecture
+## 3. System Architecture
 
-## 3.1 Architecture Overview
-
-```text
-Source Repository
-       |
-       v
-Documentation Generation
-       |
-       v
-Generated HLD
+### 3.1. Architectural Diagram
+```mermaid
+graph TD
+    Developer[Developer PR] --> SourceRepo[Source Repository]
+    SourceRepo --> Impact[Documentation Impact Workflow]
+    Impact --> Dispatch[Repository Dispatch]
+    Dispatch --> DocsRepo[doc-as-code Repository]
+    DocsRepo --> HLD[Generated HLD]
+    DocsRepo --> Review[Documentation Review]
 ```
 
-## 3.2 Components
+### 3.2. System Components
+- **src/deploy.py**: Author: Jijeesh Valappil
+Module: Greenfield Cloud Infrastructure Automation Engine
 
-- Not identified.
-
----
-
-# 4. Data Flow
-
-Source Code -> Documentation Pipeline -> HLD
-
----
-
-# 5. Integrations
-
+### 3.3. Technology Stack
 - GitHub
 - GitHub Actions
-- Documentation-as-Code
+- Python
+- Markdown
+- MkDocs
+- Mermaid
 
 ---
 
-# 6. Security
+## 4. Data Flow and Storage
 
-- Security review required.
-- Access control TBD.
-- Audit logging TBD.
+### 4.1. Data Flow Diagram
+```mermaid
+graph LR
+    CodeChange[Code Change] --> ChangedFiles[Changed Files]
+    ChangedFiles --> Mapping[documentation-map.yaml]
+    Mapping --> Request[doc-request.json]
+    Request --> Generator[HLD and LLD Generator]
+    Generator --> Docs[Generated Markdown Documents]
+```
 
----
+### 4.2. Data Model/Storage
+Changed files used for this generation:
 
-# 7. Operations
-
-- Automated GitHub Actions execution
-- Generated documentation lifecycle
-
----
-
-# 8. Risks
-
-- Generated content may require manual review.
-- Business requirements may not be fully visible in source code.
+- src/deploy.py
 
 ---
 
-# 9. Open Questions
+## 5. Integration and APIs
 
-- Additional integrations required?
-- Additional business requirements?
+### 5.1. External System Integrations
+- Source code repository
+- Central Actions repository
+- Documentation template repository
+- MkDocs documentation repository
+
+### 5.2. API Strategy
+GitHub repository dispatch is used to trigger documentation generation in the documentation repository.
+
+---
+
+## 6. Security and Compliance
+- Repository tokens must be stored in GitHub Secrets.
+- Generated documentation must be reviewed before merge.
+- Secrets, keys, credentials, and customer-sensitive identifiers must not be copied into documentation.
+- Automation must follow least privilege access principles.
+
+---
+
+## 7. Deployment and Operations
+
+### 7.1. Deployment Strategy
+Documentation is generated by GitHub Actions and committed to the MkDocs documentation repository.
+
+### 7.2. Monitoring and Logging
+- GitHub Actions logs provide workflow traceability.
+- Pull request history provides review traceability.
+- Generated files provide source-to-document linkage.
+
+---
+
+## 8. Risks and Assumptions
+- Generated documentation may require manual correction.
+- Business intent may not be fully represented by source code alone.
+- Documentation quality depends on source code comments and function names.
+- Human review remains mandatory before publication.
+
+---
+
+## 9. Open Questions
+- Should generated content update existing sections instead of replacing the full document?
+- Should AI-based generation be added after the deterministic pipeline is stable?
+- Should documentation updates require PR labels before generation?
