@@ -1,6 +1,11 @@
 # --- this is configuration for main documentation site ---
-site_name: ATOS VMware Cloud Services
+
+site_name: Test
 site_author: VCS Engineering
+
+site_url: https://jijeeshlab.github.io/doc-as-code/
+
+use_directory_urls: true
 
 strict: false
 
@@ -10,23 +15,25 @@ validation:
     anchors: warn
 
 # --- main page link to repo ---
+
 repo_url: https://github.com/jijeeshlab/doc-as-code
 repo_name: doc-as-code
-copyright: Copyright &amp;copy; 2026 Atos
+
+copyright: Copyright © 2026 Atos
 
 theme:
   name: material
   language: en
   font: false
 
-  # font:
-  #   code: Roboto Mono
-
   features:
     - navigation.instant
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
 
   palette:
-    # Light mode
+
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: blue
@@ -35,7 +42,6 @@ theme:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
 
-    # Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: blue
@@ -50,52 +56,98 @@ theme:
   logo: images/logos/New_Atos_logo_white.png
   favicon: images/logos/Atos_logo_blue.png
 
-######### navigation here #######################################################
-# add link to your content here, but do not change any other section in this yaml
-######### end of navigation block ###############################################
+###############################################################################
+# NAVIGATION
+###############################################################################
+
+nav:
+
+  - Home: index.md
+
+  - Architecture and Designs:
+
+      - High Level Designs:
+
+          - Greenfield Network HLD: 02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md
+
+      - Low Level Designs:
+
+          - Greenfield Network LLD: 02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md
+
+###############################################################################
+# MARKDOWN EXTENSIONS
+###############################################################################
 
 markdown_extensions:
+
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+
   - admonition
+
   - pymdownx.tabbed:
       alternate_style: true
+
   - pymdownx.tasklist:
       custom_checkbox: true
+
   - pymdownx.highlight:
       linenums: true
       anchor_linenums: true
+
   - pymdownx.details
+
   - pymdownx.snippets:
       base_path: "."
       check_paths: true
+
   - meta
   - attr_list
+
   - smarty:
       smart_quotes: true
+
   - pymdownx.betterem
+
   - def_list
   - tables
   - abbr
   - footnotes
   - md_in_html
+
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
+###############################################################################
+# EXTRA
+###############################################################################
+
 extra:
+
   version:
     provider: mike
+
+###############################################################################
+# CSS
+###############################################################################
 
 extra_css:
   - stylesheets/extended.css
 
+###############################################################################
+# PLUGINS
+###############################################################################
+
 plugins:
+
   - search
+
   - git-revision-date-localized
+
   - glightbox:
       zoomable: true
       draggable: true
