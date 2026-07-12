@@ -13,7 +13,7 @@ permissions:
 
 jobs:
 
-  documentation-generation:
+  debug-template-access:
 
     runs-on: ubuntu-latest
 
@@ -22,118 +22,57 @@ jobs:
       - name: Checkout Documentation Repository
         uses: actions/checkout@v4
 
-      - name: Verify PAT Authentication
+      - name: Show GitHub User
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
-          echo "========================================="
+          echo "=================================="
           echo "AUTHENTICATED USER"
-          echo "========================================="
-
+          echo "=================================="
           gh api user
 
-      - name: Verify Template Repository
+      - name: Verify Repository Access
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
+          echo "=================================="
+          echo "DOC-TEMPLETE"
+          echo "=================================="
 
-          echo "========================================="
-          echo "DOC TEMPLATE"
-          echo "========================================="
-
-          gh api repos/jijeeshlab/doc-templete
+          gh api repos/jijeeshlab/doc-templete || true
 
           echo ""
 
-          echo "========================================="
+          echo "=================================="
           echo "MAIN BRANCH"
-          echo "========================================="
+          echo "=================================="
 
-          gh api repos/jijeeshlab/doc-templete/branches/main
+          gh api repos/jijeeshlab/doc-templete/branches/main || true
 
-      - name: Clone Template Repository
+      - name: Manual Clone Test
         env:
           GIT_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
-          echo "========================================="
-          echo "CLONING TEMPLATE"
-          echo "========================================="
-
-          rm -rf template
+          echo "=================================="
+          echo "MANUAL CLONE TEST"
+          echo "=================================="
 
           git clone \
             https://x-access-token:${GIT_TOKEN}@github.com/jijeeshlab/doc-templete.git \
             template
 
-          echo ""
-
-          echo "========================================="
-          echo "TEMPLATE FILES"
-          echo "========================================="
+      - name: Show Template Content
+        run: |
+          echo "=================================="
+          echo "FILES"
+          echo "=================================="
 
           find template -maxdepth 3 -type f | sort
 
-      - name: Clone Actions Repository
-        env:
-          GIT_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Display Dispatch Payload
         run: |
-
-          rm -rf _actions
-
-          git clone \
-            https://x-access-token:${GIT_TOKEN}@github.com/jijeeshlab/Actions.git \
-            _actions
-
-      - name: Clone Source Repository
-        env:
-          GIT_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
-        run: |
-
-          rm -rf source
-
-          git clone \
-            https://x-access-token:${GIT_TOKEN}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
-            source
-
-      - name: Display Payload
-        run: |
-
-          echo "========================================="
+          echo "=================================="
           echo "PAYLOAD"
-          echo "========================================="
+          echo "=================================="
 
           echo '${{ toJson(github.event.client_payload) }}'
-
-      - name: Create doc-request.json
-        run: |
-
-          cat > doc-request.json <<'EOF'
-          ${{ toJson(github.event.client_payload) }}
-          EOF
-
-          cat doc-request.json
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml
-
-      - name: Show Workspace
-        run: |
-
-          echo "========================================="
-          echo "WORKSPACE"
-          echo "========================================="
-
-          ls -la
-
-          echo ""
-
-          find . -maxdepth 3 -type d | sort
