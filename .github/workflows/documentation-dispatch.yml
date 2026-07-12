@@ -1,58 +1,107 @@
-name: Documentation Dispatch Debug
+name: Documentation Dispatch
 
 on:
+  repository_dispatch:
+    types:
+      - documentation_update_requested
+
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
 
-  debug:
+  documentation-generation:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Show Current GitHub User
-        env:
-          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Checkout Documentation Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/Actions
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          ref: main
+          path: _actions
+
+      - name: Checkout Template Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/doc-templete
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          ref: main
+          path: template
+
+      - name: Checkout Source Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.client_payload.source_repo_full }}
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          ref: main
+          path: source
+
+      - name: Show Payload
         run: |
-          echo "========================================"
-          echo "CURRENT USER"
-          echo "========================================"
-          gh api user
+          echo '${{ toJson(github.event.client_payload) }}'
 
-      - name: Test Repository API Access
-        env:
-          GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Create doc-request.json
         run: |
-          echo "========================================"
-          echo "DOC-TEMPLETE REPOSITORY"
-          echo "========================================"
+          cat > doc-request.json <<'EOF'
+          ${{ toJson(github.event.client_payload) }}
+          EOF
 
-          gh api repos/jijeeshlab/doc-templete
+          cat doc-request.json
 
-          echo ""
-          echo "========================================"
-          echo "MAIN BRANCH"
-          echo "========================================"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-          gh api repos/jijeeshlab/doc-templete/branches/main
-
-      - name: Manual Clone Test
-        env:
-          PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+      - name: Install Python Dependencies
         run: |
-          echo "========================================"
-          echo "MANUAL CLONE TEST"
-          echo "========================================"
+          python -m pip install --upgrade pip
+          pip install pyyaml
 
-          git clone \
-            https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
-            template
-
-      - name: Show Files
+      - name: Generate HLD
         run: |
-          echo "========================================"
-          echo "FILES"
-          echo "========================================"
+          python _actions/scripts/generate-hld.py
 
-          find template -maxdepth 3 -type f | sort
+      - name: Generate LLD
+        run: |
+          python _actions/scripts/generate-lld.py
+
+      - name: Generate Diagrams
+        run: |
+          python _actions/scripts/generate-diagram.py
+
+      - name: Update Navigation
+        run: |
+          python _actions/scripts/update-navigation.py
+
+      - name: Show Generated Files
+        run: |
+          echo "===== GENERATED DOCS ====="
+          find docs -type f | sort || true
+
+      - name: Commit Documentation
+        run: |
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No documentation changes detected."
+            exit 0
+          fi
+
+          git commit -m "Automated documentation update"
+
+          git push
