@@ -11,7 +11,7 @@ validation:
 
 # --- main page link to repo ---
 repo_url: https://github.com/jijeeshlab/doc-as-code
-repo_name: GitHub
+repo_name: doc-as-code
 copyright: Copyright &amp;copy; 2026 Atos
 
 theme:
