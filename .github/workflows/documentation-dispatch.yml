@@ -23,6 +23,9 @@ jobs:
 
       - name: Show Payload
         run: |
+          echo "=================================="
+          echo "DISPATCH PAYLOAD"
+          echo "=================================="
           echo '${{ toJson(github.event.client_payload) }}'
 
       - name: Create doc-request.json
@@ -30,6 +33,10 @@ jobs:
           cat > doc-request.json << 'EOF'
           ${{ toJson(github.event.client_payload) }}
           EOF
+
+          echo "=================================="
+          echo "DOC REQUEST"
+          echo "=================================="
 
           cat doc-request.json
 
@@ -40,8 +47,14 @@ jobs:
           rm -rf _actions
 
           git clone \
-          https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
-          _actions
+            https://x-access-token:${PAT}@github.com/jijeeshlab/Actions.git \
+            _actions
+
+          echo "=================================="
+          echo "ACTIONS CONTENT"
+          echo "=================================="
+
+          find _actions -maxdepth 3 -type f | sort
 
       - name: Clone Template Repository
         env:
@@ -50,8 +63,14 @@ jobs:
           rm -rf template
 
           git clone \
-          https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
-          template
+            https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
+            template
+
+          echo "=================================="
+          echo "TEMPLATE CONTENT"
+          echo "=================================="
+
+          find template -maxdepth 5 -type f | sort
 
       - name: Clone Source Repository
         env:
@@ -60,8 +79,14 @@ jobs:
           rm -rf source
 
           git clone \
-          https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
-          source
+            https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
+            source
+
+          echo "=================================="
+          echo "SOURCE CONTENT"
+          echo "=================================="
+
+          find source -maxdepth 5 -type f | sort
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -73,16 +98,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
 
-      - name: Generate HLD
+      - name: Verify Agent Files
         run: |
-          python _actions/scripts/generate-hld.py
+          echo "=================================="
+          echo "AGENT FILES"
+          echo "=================================="
 
-      - name: Generate LLD
+          find _actions/agents -type f | sort
+
+      - name: Generate Agent Based Documentation
         run: |
-          python _actions/scripts/generate-lld.py
-
-      # REMOVED generate-diagram.py
-      # Diagrams are embedded inside HLD/LLD
+          python _actions/scripts/generate-agent-docs.py
 
       - name: Update Navigation
         run: |
@@ -95,6 +121,22 @@ jobs:
           echo "=================================="
 
           find docs -type f | sort
+
+      - name: Verify Generated HLD
+        run: |
+          echo "=================================="
+          echo "GENERATED HLD PREVIEW"
+          echo "=================================="
+
+          find docs -name "*hld*.md" -exec head -50 {} \;
+
+      - name: Verify Generated LLD
+        run: |
+          echo "=================================="
+          echo "GENERATED LLD PREVIEW"
+          echo "=================================="
+
+          find docs -name "*lld*.md" -exec head -50 {} \;
 
       - name: Cleanup Temporary Files
         run: |
@@ -125,6 +167,6 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Generate documentation"
+          git commit -m "Generate documentation using agents"
 
           git push
