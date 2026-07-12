@@ -11,53 +11,49 @@ jobs:
 
     steps:
 
-      - name: Show Authenticated User
+      - name: Checkout Current Repository
+        uses: actions/checkout@v4
+
+      - name: Show Current User
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
-          echo "========================================"
-          echo "AUTHENTICATED USER"
-          echo "========================================"
+          echo "===================================="
+          echo "CURRENT USER"
+          echo "===================================="
 
           gh api user
 
-      - name: Test Repository Access
+      - name: Verify Repository Access
         env:
           GH_TOKEN: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
-          echo "========================================"
-          echo "DOC TEMPLATE REPO"
-          echo "========================================"
+          echo "===================================="
+          echo "DOC-TEMPLETE"
+          echo "===================================="
 
           gh api repos/jijeeshlab/doc-templete || true
 
           echo ""
-          echo "========================================"
+
+          echo "===================================="
           echo "MAIN BRANCH"
-          echo "========================================"
+          echo "===================================="
 
           gh api repos/jijeeshlab/doc-templete/branches/main || true
 
-      - name: Manual Clone Test
+      - name: Clone Repository Test
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
         run: |
-
-          echo "========================================"
+          echo "===================================="
           echo "CLONE TEST"
-          echo "========================================"
+          echo "===================================="
 
           git clone \
             https://x-access-token:${PAT}@github.com/jijeeshlab/doc-templete.git \
             template
 
-      - name: Display Files
+      - name: Verify Files
         run: |
-
-          echo "========================================"
-          echo "FILES"
-          echo "========================================"
-
           find template -maxdepth 3 -type f | sort
