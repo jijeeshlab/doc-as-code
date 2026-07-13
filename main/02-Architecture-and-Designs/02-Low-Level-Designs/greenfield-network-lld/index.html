@@ -478,6 +478,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Low-Level Design (LLD): greenfield-network
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -494,6 +512,53 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#agent-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lld-agent-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLD Agent Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -535,6 +600,42 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#agent-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lld-agent-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLD Agent Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -555,66 +656,255 @@
 
 <h1 id="low-level-design-lld-greenfield-network">Low-Level Design (LLD): greenfield-network</h1>
 <p><strong>Author</strong>: Jijeesh Valappil
-<strong>Date</strong>: 2026-07-12
-<strong>Version</strong>: 1.0</p>
+<strong>Date</strong>: 2026-07-13
+<strong>Version</strong>: 1.0
+<strong>Related HLD</strong>: docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md</p>
+<hr>
+<h2 id="agent-context">Agent Context</h2>
+<table>
+<thead>
+<tr>
+<th>Agent File</th>
+<th>Loaded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lld-agent.md</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>diagram-agent.md</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lld-agent-summary">LLD Agent Summary</h3>
+<h1 id="low-level-design-agent-role-you-are-a-solution-architect-and-documentation-agent-your-task-is-to-generate-a-complete-low-level-design-document-based-on-source-code-pull-request-details-existing-documentation-lld-template">Low Level Design Agent ## Role You are a Solution Architect and Documentation Agent. Your task is to generate a complete Low-Level Design document based on: - Source code - Pull request details - Existing documentation - LLD template</h1>
+<hr>
+<h2 id="1-introduction">1. Introduction</h2>
+<h3 id="11-overview">1.1. Overview</h3>
+<p>This document provides the low-level design for <code>greenfield-network</code> based on source code changes.</p>
 <p><strong>Source Repository</strong>: <code>jijeeshlab/greenfield-code</code>
-<strong>Source PR Number</strong>: <code>8</code>
-<strong>Source PR Title</strong>: Update deploy.py</p>
+<strong>Source PR</strong>: <code>12</code>
+<strong>Source PR Title</strong>: Testing</p>
 <hr>
-<h1 id="1-introduction">1. Introduction</h1>
-<h2 id="11-overview">1.1 Overview</h2>
-<p>This document describes the low-level implementation architecture generated from source code changes.</p>
-<hr>
-<h1 id="2-detailed-design">2. Detailed Design</h1>
-<h2 id="21-class-diagram">2.1 Class Diagram</h2>
+<h2 id="2-detailed-design">2. Detailed Design</h2>
+<h3 id="21-class-diagram">2.1. Class Diagram</h3>
 <pre class="mermaid"><code>classDiagram
-    class SourceRepository
-    class DocumentationGenerator
-
-    SourceRepository --&gt; DocumentationGenerator</code></pre>
-<h2 id="22-sequence-diagram">2.2 Sequence Diagram</h2>
+    class SourceRepository {
+        +changed_files()
+    }
+    class AgentAwareDocumentationGenerator {
+        +load_agents()
+        +inspect_source_code()
+        +generate_hld()
+        +generate_lld()
+    }
+    SourceRepository --&gt; AgentAwareDocumentationGenerator</code></pre>
+<h3 id="22-sequence-diagram">2.2. Sequence Diagram</h3>
 <pre class="mermaid"><code>sequenceDiagram
     participant Developer
     participant SourceRepo
     participant ActionsRepo
     participant DocsRepo
-
-    Developer-&gt;&gt;SourceRepo: Code Change
-    SourceRepo-&gt;&gt;ActionsRepo: Detect Impact
-    ActionsRepo-&gt;&gt;DocsRepo: Dispatch Event
-    DocsRepo-&gt;&gt;DocsRepo: Generate Documentation</code></pre>
-<h2 id="23-component-breakdown">2.3 Component Breakdown</h2>
+    Developer-&gt;&gt;SourceRepo: Create or update PR
+    SourceRepo-&gt;&gt;ActionsRepo: Trigger documentation impact workflow
+    ActionsRepo-&gt;&gt;DocsRepo: Send repository_dispatch event
+    DocsRepo-&gt;&gt;DocsRepo: Load agent files and generate HLD/LLD</code></pre>
+<h3 id="23-component-breakdown">2.3. Component Breakdown</h3>
 <h3 id="source-file-srcdeploypy">Source File: <code>src/deploy.py</code></h3>
-<p>No functions detected.</p>
+<p><strong>Parse Status:</strong> <code>ast_success</code></p>
+<h4 id="function-provision_zero_trust_network">Function: <code>provision_zero_trust_network</code></h4>
+<p><strong>Description:</strong> Provisions zero trust network segmentation.</p>
+<p><strong>Parameters:</strong> cidr_block</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-validate_network_segmentation">Function: <code>validate_network_segmentation</code></h4>
+<p><strong>Description:</strong> Validates network segmentation policies.</p>
+<p><strong>Parameters:</strong> segment_name</p>
+<p><strong>Returns:</strong> bool</p>
+<h4 id="function-deploy_application_load_balancer">Function: <code>deploy_application_load_balancer</code></h4>
+<p><strong>Description:</strong> Deploys application load balancer.</p>
+<p><strong>Parameters:</strong> load_balancer_name, vip_address</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_private_dns_zone">Function: <code>deploy_private_dns_zone</code></h4>
+<p><strong>Description:</strong> Deploys private DNS services.</p>
+<p><strong>Parameters:</strong> zone_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_vpn_gateway">Function: <code>deploy_vpn_gateway</code></h4>
+<p><strong>Description:</strong> Deploys VPN gateway service.</p>
+<p><strong>Parameters:</strong> gateway_name, public_ip</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_storage_gateway">Function: <code>deploy_storage_gateway</code></h4>
+<p><strong>Description:</strong> Deploys storage gateway service.</p>
+<p><strong>Parameters:</strong> gateway_name, storage_pool</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_disaster_recovery_gateway">Function: <code>deploy_disaster_recovery_gateway</code></h4>
+<p><strong>Description:</strong> Deploys disaster recovery gateway services.</p>
+<p><strong>Parameters:</strong> gateway_name, recovery_site</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_backup_replication_service">Function: <code>deploy_backup_replication_service</code></h4>
+<p><strong>Description:</strong> Deploys backup and replication services.</p>
+<p><strong>Parameters:</strong> policy_name, retention_days</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_observability_stack">Function: <code>deploy_observability_stack</code></h4>
+<p><strong>Description:</strong> Deploys observability platform.</p>
+<p><strong>Parameters:</strong> stack_name, monitoring_enabled</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_ai_observability_platform">Function: <code>deploy_ai_observability_platform</code></h4>
+<p><strong>Description:</strong> Deploys AI observability and governance platform.</p>
+<p><strong>Parameters:</strong> platform_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_kubernetes_cluster">Function: <code>deploy_kubernetes_cluster</code></h4>
+<p><strong>Description:</strong> Deploys Kubernetes cluster.</p>
+<p><strong>Parameters:</strong> cluster_name, worker_count</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_ingress_controller">Function: <code>deploy_ingress_controller</code></h4>
+<p><strong>Description:</strong> Deploys ingress controller.</p>
+<p><strong>Parameters:</strong> controller_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_service_mesh">Function: <code>deploy_service_mesh</code></h4>
+<p><strong>Description:</strong> Deploys service mesh architecture.</p>
+<p><strong>Parameters:</strong> mesh_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_api_gateway">Function: <code>deploy_api_gateway</code></h4>
+<p><strong>Description:</strong> Deploys API gateway platform.</p>
+<p><strong>Parameters:</strong> gateway_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_secrets_management">Function: <code>deploy_secrets_management</code></h4>
+<p><strong>Description:</strong> Deploys secrets management service.</p>
+<p><strong>Parameters:</strong> vault_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_zero_trust_access_policy">Function: <code>deploy_zero_trust_access_policy</code></h4>
+<p><strong>Description:</strong> Deploys zero trust access policies.</p>
+<p><strong>Parameters:</strong> policy_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_security_operations_platform">Function: <code>deploy_security_operations_platform</code></h4>
+<p><strong>Description:</strong> Deploys security operations platform.</p>
+<p><strong>Parameters:</strong> platform_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_event_stream_platform">Function: <code>deploy_event_stream_platform</code></h4>
+<p><strong>Description:</strong> Deploys Kafka event streaming platform.</p>
+<p><strong>Parameters:</strong> cluster_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_ai_gateway">Function: <code>deploy_ai_gateway</code></h4>
+<p><strong>Description:</strong> Deploys AI gateway service.</p>
+<p><strong>Parameters:</strong> gateway_name, model_provider</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_document_intelligence_service">Function: <code>deploy_document_intelligence_service</code></h4>
+<p><strong>Description:</strong> Deploys document intelligence services.</p>
+<p><strong>Parameters:</strong> service_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_model_serving_endpoint">Function: <code>deploy_model_serving_endpoint</code></h4>
+<p><strong>Description:</strong> Deploys AI model serving endpoint.</p>
+<p><strong>Parameters:</strong> endpoint_name, model_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_prompt_management_service">Function: <code>deploy_prompt_management_service</code></h4>
+<p><strong>Description:</strong> Deploys prompt management services.</p>
+<p><strong>Parameters:</strong> service_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_data_lakehouse">Function: <code>deploy_data_lakehouse</code></h4>
+<p><strong>Description:</strong> Deploys enterprise data lakehouse platform.</p>
+<p><strong>Parameters:</strong> storage_account, container_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_stream_analytics_platform">Function: <code>deploy_stream_analytics_platform</code></h4>
+<p><strong>Description:</strong> Deploys streaming analytics platform.</p>
+<p><strong>Parameters:</strong> cluster_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_vector_database">Function: <code>deploy_vector_database</code></h4>
+<p><strong>Description:</strong> Deploys vector database service.</p>
+<p><strong>Parameters:</strong> database_name</p>
+<p><strong>Returns:</strong> dict</p>
+<h4 id="function-deploy_rag_platform">Function: <code>deploy_rag_platform</code></h4>
+<p><strong>Description:</strong> Deploys Retrieval Augmented Generation platform.</p>
+<p><strong>Parameters:</strong> vector_database, embedding_model</p>
+<p><strong>Returns:</strong> dict</p>
 <hr>
-<h1 id="3-function-inventory">3. Function Inventory</h1>
+<h2 id="3-database-design">3. Database Design</h2>
+<h3 id="31-database-schema">3.1. Database Schema</h3>
+<p>No database schema was detected in the changed source files.</p>
+<table>
+<thead>
+<tr>
+<th>Table Name</th>
+<th>Column Name</th>
+<th>Data Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Not applicable</td>
+<td>Not applicable</td>
+<td>Not applicable</td>
+<td>Not applicable</td>
+<td>No database layer detected</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-data-access-layer">3.2. Data Access Layer</h3>
+<p>No dedicated data access layer was identified from the changed source files.</p>
+<hr>
+<h2 id="4-api-endpoint-specification">4. API Endpoint Specification</h2>
+<p>No API endpoint was detected in the changed source files.</p>
+<hr>
+<h2 id="5-error-handling">5. Error Handling</h2>
 <ul>
-<li>To Be Determined (TBD)</li>
+<li>Validate input parameters before processing.</li>
+<li>Log operational events without exposing sensitive data.</li>
+<li>Return predictable status values.</li>
+<li>Avoid silent failures.</li>
 </ul>
 <hr>
-<h1 id="4-error-handling">4. Error Handling</h1>
+<h2 id="6-security-considerations">6. Security Considerations</h2>
 <ul>
-<li>Input validation</li>
-<li>Logging</li>
-<li>Exception handling</li>
+<li>Validate all inputs.</li>
+<li>Do not log secrets, tokens, keys, passwords, or customer-sensitive identifiers.</li>
+<li>Use GitHub Secrets for automation credentials.</li>
+<li>Review generated documentation before publishing.</li>
 </ul>
 <hr>
-<h1 id="5-security-considerations">5. Security Considerations</h1>
+<h2 id="7-unit-test-cases">7. Unit Test Cases</h2>
 <ul>
-<li>GitHub Secrets used for authentication</li>
-<li>Token values must never be logged</li>
-<li>Review generated documentation before publication</li>
+<li><code>provision_zero_trust_network()</code></li>
+<li><code>validate_network_segmentation()</code></li>
+<li><code>deploy_application_load_balancer()</code></li>
+<li><code>deploy_private_dns_zone()</code></li>
+<li><code>deploy_vpn_gateway()</code></li>
+<li><code>deploy_storage_gateway()</code></li>
+<li><code>deploy_disaster_recovery_gateway()</code></li>
+<li><code>deploy_backup_replication_service()</code></li>
+<li><code>deploy_observability_stack()</code></li>
+<li><code>deploy_ai_observability_platform()</code></li>
+<li><code>deploy_kubernetes_cluster()</code></li>
+<li><code>deploy_ingress_controller()</code></li>
+<li><code>deploy_service_mesh()</code></li>
+<li><code>deploy_api_gateway()</code></li>
+<li><code>deploy_secrets_management()</code></li>
+<li><code>deploy_zero_trust_access_policy()</code></li>
+<li><code>deploy_security_operations_platform()</code></li>
+<li><code>deploy_event_stream_platform()</code></li>
+<li><code>deploy_ai_gateway()</code></li>
+<li><code>deploy_document_intelligence_service()</code></li>
+<li><code>deploy_model_serving_endpoint()</code></li>
+<li><code>deploy_prompt_management_service()</code></li>
+<li><code>deploy_data_lakehouse()</code></li>
+<li><code>deploy_stream_analytics_platform()</code></li>
+<li><code>deploy_vector_database()</code></li>
+<li><code>deploy_rag_platform()</code></li>
 </ul>
 <hr>
-<h1 id="6-changed-files">6. Changed Files</h1>
+<h2 id="8-open-questions">8. Open Questions</h2>
+<ul>
+<li>Should AI generation update only impacted sections instead of regenerating full documents?</li>
+<li>Should class and sequence diagrams be generated from code structure or architecture metadata?</li>
+<li>Should PR labels control whether documentation generation runs?</li>
+</ul>
+<hr>
+<h2 id="changed-files">Changed Files</h2>
 <ul>
 <li>src/deploy.py</li>
-</ul>
-<hr>
-<h1 id="7-open-questions">7. Open Questions</h1>
-<ul>
-<li>Additional business rules required?</li>
-<li>Additional architectural requirements required?</li>
 </ul>
 
 
@@ -636,7 +926,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 12, 2026 09:23:51 UTC">July 12, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 13, 2026 09:24:31 UTC">July 13, 2026</span>
   </span>
 
     
