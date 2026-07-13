@@ -39,7 +39,7 @@ jobs:
           EOF
 
           echo "=================================="
-          echo "DOC REQUEST"
+          echo "DOC REQUEST CONTENT"
           echo "=================================="
 
           cat doc-request.json
@@ -74,6 +74,14 @@ jobs:
             https://x-access-token:${PAT}@github.com/${{ github.event.client_payload.source_repo_full }}.git \
             source
 
+      - name: Show Source Repository Files
+        run: |
+          echo "=================================="
+          echo "SOURCE FILES"
+          echo "=================================="
+
+          find source -type f | sort
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -94,7 +102,25 @@ jobs:
 
       - name: Generate Agent Based Documentation
         run: |
+          echo "=================================="
+          echo "RUNNING AGENT GENERATOR"
+          echo "=================================="
+
           python _actions/scripts/generate-agent-docs.py
+
+          echo ""
+          echo "=================================="
+          echo "GENERATED HLD FILES"
+          echo "=================================="
+
+          find docs -name "*hld*.md" -type f -exec ls -lah {} \;
+
+          echo ""
+          echo "=================================="
+          echo "GENERATED LLD FILES"
+          echo "=================================="
+
+          find docs -name "*lld*.md" -type f -exec ls -lah {} \;
 
       - name: Update Navigation
         run: |
@@ -111,18 +137,18 @@ jobs:
       - name: Verify Generated HLD
         run: |
           echo "=================================="
-          echo "GENERATED HLD PREVIEW"
+          echo "GENERATED HLD CONTENT"
           echo "=================================="
 
-          find docs -name "*hld*.md" -exec head -80 {} \;
+          cat docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md || true
 
       - name: Verify Generated LLD
         run: |
           echo "=================================="
-          echo "GENERATED LLD PREVIEW"
+          echo "GENERATED LLD CONTENT"
           echo "=================================="
 
-          find docs -name "*lld*.md" -exec head -80 {} \;
+          cat docs/02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md || true
 
       - name: Verify Agent Context Exists
         run: |
@@ -152,6 +178,17 @@ jobs:
           echo "=================================="
 
           grep -R "diagram-agent.md" docs || true
+
+      - name: Verify Functions Found
+        run: |
+          echo "=================================="
+          echo "SEARCHING FOR NEW FUNCTIONS"
+          echo "=================================="
+
+          grep -R "deploy_ai_gateway" docs || true
+          grep -R "deploy_rag_platform" docs || true
+          grep -R "deploy_data_lakehouse" docs || true
+          grep -R "deploy_kubernetes_cluster" docs || true
 
       - name: Verify Agent Generator Was Used
         run: |
@@ -201,14 +238,16 @@ jobs:
           echo "SYNC WITH REMOTE"
           echo "=================================="
 
-          for i in 1 2 3; do
+          for i in 1 2 3
+          do
 
             echo ""
-            echo "Attempt: $i"
+            echo "Push attempt $i"
 
             git pull --rebase origin main
 
-            if git push origin HEAD:main; then
+            if git push origin HEAD:main
+            then
 
               echo ""
               echo "=================================="
