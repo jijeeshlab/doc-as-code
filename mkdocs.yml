@@ -101,3 +101,7 @@ plugins:
       draggable: true
       skip_classes:
         - skip-lightbox
+
+  - AI Generated Documentation:
+      - Migration Platform Hld: 08-Migrations-and-Projects/migration-platform-hld.md
+      - Migration Platform Lld: 08-Migrations-and-Projects/migration-platform-lld.md
