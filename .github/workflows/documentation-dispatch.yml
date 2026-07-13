@@ -96,6 +96,60 @@ jobs:
 
           find source -type f | sort
 
+          echo ""
+          echo "=================================="
+          echo "DEPLOY.PY CONTENT"
+          echo "=================================="
+
+          cat source/src/deploy.py || true
+
+          echo ""
+          echo "=================================="
+          echo "PYTHON SYNTAX CHECK"
+          echo "=================================="
+
+          python -m py_compile source/src/deploy.py
+
+          echo "Python syntax validation passed."
+
+      - name: Validate Function Detection
+        run: |
+          echo "=================================="
+          echo "FUNCTION DETECTION TEST"
+          echo "=================================="
+
+          python - << 'EOF'
+          import ast
+          from pathlib import Path
+
+          file_path = Path("source/src/deploy.py")
+
+          print(f"Checking: {file_path}")
+
+          content = file_path.read_text(
+              encoding="utf-8",
+              errors="ignore"
+          )
+
+          tree = ast.parse(content)
+
+          functions = []
+
+          for node in ast.walk(tree):
+              if isinstance(node, ast.FunctionDef):
+                  functions.append(node.name)
+
+          print("")
+          print("Functions Found:")
+          print("==============================")
+
+          for f in functions:
+              print(f)
+
+          print("")
+          print(f"Total Functions Found: {len(functions)}")
+          EOF
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -190,7 +244,6 @@ jobs:
 
       - name: Commit Documentation
         run: |
-
           echo "=================================="
           echo "COMMIT DOCUMENTATION"
           echo "=================================="
@@ -229,6 +282,7 @@ jobs:
               exit 0
             fi
 
+            echo "Retrying..."
             sleep 5
 
           done
