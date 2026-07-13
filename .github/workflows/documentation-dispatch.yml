@@ -44,6 +44,20 @@ jobs:
 
           cat doc-request.json
 
+          echo ""
+          echo "=================================="
+          echo "CHANGED FILES"
+          echo "=================================="
+
+          grep -i changed_files doc-request.json || true
+
+          echo ""
+          echo "=================================="
+          echo "IMPACTED SERVICES"
+          echo "=================================="
+
+          grep -i impacted_services doc-request.json || true
+
       - name: Clone Actions Repository
         env:
           PAT: ${{ secrets.CENTRAL_DOCS_TOKEN }}
@@ -122,6 +136,38 @@ jobs:
 
           find docs -name "*lld*.md" -type f -exec ls -lah {} \;
 
+          echo ""
+          echo "=================================="
+          echo "GREENFIELD HLD CONTENT"
+          echo "=================================="
+
+          cat docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md || true
+
+          echo ""
+          echo "=================================="
+          echo "GREENFIELD LLD CONTENT"
+          echo "=================================="
+
+          cat docs/02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md || true
+
+          echo ""
+          echo "=================================="
+          echo "SEARCHING FOR AGENT CONTEXT"
+          echo "=================================="
+
+          grep -R "Agent Context" docs || true
+
+          echo ""
+          echo "=================================="
+          echo "SEARCHING FOR FUNCTIONS"
+          echo "=================================="
+
+          grep -R "deploy_ai_gateway" docs || true
+          grep -R "deploy_rag_platform" docs || true
+          grep -R "deploy_data_lakehouse" docs || true
+          grep -R "deploy_kubernetes_cluster" docs || true
+          grep -R "deploy_salesforce_platform" docs || true
+
       - name: Update Navigation
         run: |
           python _actions/scripts/update-navigation.py
@@ -133,70 +179,6 @@ jobs:
           echo "=================================="
 
           find docs -type f | sort
-
-      - name: Verify Generated HLD
-        run: |
-          echo "=================================="
-          echo "GENERATED HLD CONTENT"
-          echo "=================================="
-
-          cat docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md || true
-
-      - name: Verify Generated LLD
-        run: |
-          echo "=================================="
-          echo "GENERATED LLD CONTENT"
-          echo "=================================="
-
-          cat docs/02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md || true
-
-      - name: Verify Agent Context Exists
-        run: |
-          echo "=================================="
-          echo "SEARCHING AGENT CONTEXT"
-          echo "=================================="
-
-          grep -R "Agent Context" docs || true
-
-          echo ""
-          echo "=================================="
-          echo "SEARCHING HLD AGENT"
-          echo "=================================="
-
-          grep -R "hld-agent.md" docs || true
-
-          echo ""
-          echo "=================================="
-          echo "SEARCHING LLD AGENT"
-          echo "=================================="
-
-          grep -R "lld-agent.md" docs || true
-
-          echo ""
-          echo "=================================="
-          echo "SEARCHING DIAGRAM AGENT"
-          echo "=================================="
-
-          grep -R "diagram-agent.md" docs || true
-
-      - name: Verify Functions Found
-        run: |
-          echo "=================================="
-          echo "SEARCHING FOR NEW FUNCTIONS"
-          echo "=================================="
-
-          grep -R "deploy_ai_gateway" docs || true
-          grep -R "deploy_rag_platform" docs || true
-          grep -R "deploy_data_lakehouse" docs || true
-          grep -R "deploy_kubernetes_cluster" docs || true
-
-      - name: Verify Agent Generator Was Used
-        run: |
-          echo "=================================="
-          echo "VERIFY AGENT GENERATOR CONTENT"
-          echo "=================================="
-
-          grep -R "Agent-Aware Documentation Generator" docs || true
 
       - name: Cleanup Temporary Files
         run: |
@@ -233,11 +215,6 @@ jobs:
 
           git commit -m "Generate documentation using agents"
 
-          echo ""
-          echo "=================================="
-          echo "SYNC WITH REMOTE"
-          echo "=================================="
-
           for i in 1 2 3
           do
 
@@ -248,25 +225,12 @@ jobs:
 
             if git push origin HEAD:main
             then
-
-              echo ""
-              echo "=================================="
-              echo "PUSH SUCCESSFUL"
-              echo "=================================="
-
+              echo "Push successful"
               exit 0
-
             fi
 
-            echo ""
-            echo "Push failed. Retrying..."
             sleep 5
 
           done
-
-          echo ""
-          echo "=================================="
-          echo "FAILED AFTER 3 ATTEMPTS"
-          echo "=================================="
 
           exit 1
