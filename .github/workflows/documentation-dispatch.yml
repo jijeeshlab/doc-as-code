@@ -98,19 +98,30 @@ jobs:
 
           echo ""
           echo "=================================="
-          echo "DEPLOY.PY CONTENT"
+          echo "PYTHON FILES"
           echo "=================================="
 
-          cat source/src/deploy.py || true
+          find source -name "*.py" -type f | sort
 
           echo ""
           echo "=================================="
           echo "PYTHON SYNTAX CHECK"
           echo "=================================="
 
-          python -m py_compile source/src/deploy.py
+          find source -name "*.py" -type f | sort | while read file
+          do
+            echo ""
+            echo "Checking: $file"
 
-          echo "Python syntax validation passed."
+            python -m py_compile "$file"
+
+            echo "OK: $file"
+          done
+
+          echo ""
+          echo "=================================="
+          echo "ALL PYTHON FILES VALIDATED"
+          echo "=================================="
 
       - name: Validate Function Detection
         run: |
@@ -122,32 +133,53 @@ jobs:
           import ast
           from pathlib import Path
 
-          file_path = Path("source/src/deploy.py")
+          py_files = sorted(Path("source").rglob("*.py"))
 
-          print(f"Checking: {file_path}")
+          total_functions = 0
 
-          content = file_path.read_text(
-              encoding="utf-8",
-              errors="ignore"
-          )
+          if not py_files:
+              print("No Python files found.")
+              raise SystemExit(1)
 
-          tree = ast.parse(content)
+          for file_path in py_files:
 
-          functions = []
+              print("")
+              print("==================================")
+              print(f"FILE: {file_path}")
+              print("==================================")
 
-          for node in ast.walk(tree):
-              if isinstance(node, ast.FunctionDef):
-                  functions.append(node.name)
+              content = file_path.read_text(
+                  encoding="utf-8",
+                  errors="ignore"
+              )
+
+              tree = ast.parse(content)
+
+              functions = []
+
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.FunctionDef):
+                      functions.append(node.name)
+
+              print("")
+              print("Functions Found:")
+              print("==============================")
+
+              if not functions:
+                  print("No functions detected")
+
+              for func in functions:
+                  print(func)
+
+              print("")
+              print(f"Function Count: {len(functions)}")
+
+              total_functions += len(functions)
 
           print("")
-          print("Functions Found:")
-          print("==============================")
-
-          for f in functions:
-              print(f)
-
-          print("")
-          print(f"Total Functions Found: {len(functions)}")
+          print("==================================")
+          print(f"TOTAL FUNCTIONS DETECTED: {total_functions}")
+          print("==================================")
           EOF
 
       - name: Setup Python
@@ -192,17 +224,29 @@ jobs:
 
           echo ""
           echo "=================================="
-          echo "GREENFIELD HLD CONTENT"
+          echo "ALL GENERATED HLD FILES"
           echo "=================================="
 
-          cat docs/02-Architecture-and-Designs/01-High-Level-Designs/greenfield-network-hld.md || true
+          find docs -name "*hld*.md" -type f | while read file
+          do
+            echo ""
+            echo "FILE: $file"
+            echo "----------------------------------"
+            cat "$file"
+          done
 
           echo ""
           echo "=================================="
-          echo "GREENFIELD LLD CONTENT"
+          echo "ALL GENERATED LLD FILES"
           echo "=================================="
 
-          cat docs/02-Architecture-and-Designs/02-Low-Level-Designs/greenfield-network-lld.md || true
+          find docs -name "*lld*.md" -type f | while read file
+          do
+            echo ""
+            echo "FILE: $file"
+            echo "----------------------------------"
+            cat "$file"
+          done
 
           echo ""
           echo "=================================="
@@ -211,16 +255,29 @@ jobs:
 
           grep -R "Agent Context" docs || true
 
-          echo ""
+      - name: Validate Documentation Content
+        run: |
           echo "=================================="
-          echo "SEARCHING FOR FUNCTIONS"
+          echo "DOCUMENT VALIDATION"
           echo "=================================="
 
-          grep -R "deploy_ai_gateway" docs || true
-          grep -R "deploy_rag_platform" docs || true
-          grep -R "deploy_data_lakehouse" docs || true
-          grep -R "deploy_kubernetes_cluster" docs || true
-          grep -R "deploy_salesforce_platform" docs || true
+          HLD_COUNT=$(find docs -name "*hld*.md" | wc -l)
+          LLD_COUNT=$(find docs -name "*lld*.md" | wc -l)
+
+          echo "HLD FILES: $HLD_COUNT"
+          echo "LLD FILES: $LLD_COUNT"
+
+          if [ "$HLD_COUNT" -eq 0 ]; then
+            echo "No HLD documents generated"
+            exit 1
+          fi
+
+          if [ "$LLD_COUNT" -eq 0 ]; then
+            echo "No LLD documents generated"
+            exit 1
+          fi
+
+          echo "Documentation validation passed"
 
       - name: Update Navigation
         run: |
@@ -270,7 +327,6 @@ jobs:
 
           for i in 1 2 3
           do
-
             echo ""
             echo "Push attempt $i"
 
@@ -284,7 +340,6 @@ jobs:
 
             echo "Retrying..."
             sleep 5
-
           done
 
           exit 1
